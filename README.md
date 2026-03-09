@@ -15,6 +15,11 @@ Energy consumption is closely linked to economic development, industrial activit
 - gt
 - Quarto
 
+## Key Findings
+- Energy consumption per person is consistently higher in G7 countries.
+- BRICS countries show increasing energy consumption over time as economies develop.
+- The gap between the groups reflects differences in industrialisation and economic development.
+
 ## Project Structure
 
 ```
@@ -35,3 +40,4 @@ Energy_Consumption_Analysis
 ## Author
 
 Jeremy Chee
+Master of Applied Computing
