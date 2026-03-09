@@ -1,0 +1,120 @@
+---
+title: "Energy Consumption Analysis: G7 vs BRICS"
+author: "Jeremy Chee"
+format: html
+editor: visual
+---
+
+## Project Overview
+
+Energy consumption is closely linked to economic development, industrial activity, and population growth. Comparing energy use across country groups can provide insight into differences in development patterns and resource demand.\
+\
+This project analyses energy consumption per person (measured in kilowatt-hours, kWh) across two major country groups:\
+\
+- \*\*G7 countries:\*\* Canada, France, Germany, Italy, Japan, United Kingdom, United States\
+- \*\*BRICS countries:\*\* Brazil, Russia, India, China, South Africa\
+\
+The goal of this analysis is to compare long-term trends in energy consumption and evaluate differences in average per-capita energy use between these groups over time.
+
+## Data Preparation
+
+```{r}
+library(gt)
+library(patchwork)
+library(tidyverse)
+
+energy_data <- read_csv("data/energy-use-per-person-kwh.csv")
+
+str(energy_data)
+colSums(is.na(energy_data))
+```
+
+## Group Definitions
+
+```{r}
+g7_countries <- c(
+  "Canada", "France", "Germany", "Italy",
+  "Japan", "United Kingdom", "United States"
+)
+
+brics_countries <- c(
+  "Brazil", "Russia", "India", "China", "South Africa"
+)
+
+energy_data <- energy_data |>
+  mutate(
+    Group = case_when(
+      Country %in% g7_countries ~ "G7",
+      Country %in% brics_countries ~ "BRICS",
+      TRUE ~ NA_character_
+    )
+  )
+
+energy_subset <- energy_data |>
+  filter(!is.na(Group))
+```
+
+## Analysis
+
+```{r}
+group_avg_energy <- energy_subset |>
+  group_by(Year, Group) |>
+  summarise(
+    avg_energy_kwh = mean(Energy, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+group_avg_energy |>
+  slice_head(n = 10) |>
+  gt()
+```
+
+## Visualisation
+
+```{r}
+#| fig-width: 14
+#| fig-asp: 1.2
+#| fig-align: center
+
+plot_brics <- energy_subset |>
+  filter(Group == "BRICS") |>
+  ggplot(aes(x = Year, y = Energy, color = Country)) +
+  geom_line() +
+  labs(
+    title = "BRICS Countries: Energy Use per Person",
+    x = "Year",
+    y = "kWh per Person"
+  ) +
+  theme_minimal()
+
+plot_g7 <- energy_subset |>
+  filter(Group == "G7") |>
+  ggplot(aes(x = Year, y = Energy, color = Country)) +
+  geom_line() +
+  labs(
+    title = "G7 Countries: Energy Use per Person",
+    x = "Year",
+    y = "kWh per Person"
+  ) +
+  theme_minimal()
+
+plot_avg <- group_avg_energy |>
+  ggplot(aes(x = Year, y = avg_energy_kwh, color = Group)) +
+  geom_line(linewidth = 1.2) +
+  labs(
+    title = "Average Energy Use per Person: G7 vs BRICS",
+    x = "Year",
+    y = "Average kWh"
+  ) +
+  theme_minimal()
+
+plot_brics / plot_g7 / plot_avg
+```
+
+## Key Findings
+
+Energy use per person is consistently higher in G7 countries than in BRICS countries across the years shown.\
+\
+The BRICS countries generally start from a much lower base, although some countries show clear growth over time, especially as industrial activity and development increase.\
+\
+The group-average comparison highlights a persistent gap between the two groups. Overall, the results suggest that G7 countries have maintained substantially higher per-capita energy consumption than BRICS countries over the period analysed.
