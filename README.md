@@ -39,5 +39,5 @@ Energy_Consumption_Analysis
 
 ## Author
 
-Jeremy Chee
+Jeremy Chee  
 Master of Applied Computing
